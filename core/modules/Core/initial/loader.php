@@ -1,1 +1,23 @@
 <?php
+require_once "./Classes/BaseLoader.php"; 
+require_once "./Classes/CUSER.php"; 
+require_once "./Classes/CLANG.php"; 
+require_once "./Classes/ExceptionEnum.php"; 
+require_once "./Classes/CSecurity.php"; 
+require_once "./Classes/CDatabase.php"; 
+require_once "./Classes/UnexpectedUriTokenExceptionEnums.php"; 
+require_once "./Classes/Provider.php"; 
+require_once "./Classes/CFiles.php";
+require_once "./log_Provider.php"; 
+require_once "./Loaders/WEB_Loader.php"; 
+require_once "./CAPP.php"; 
+require_once "./LoaderManager.php"; 
+require_once "./exceptions/ExceptionLevel.php"; 
+require_once "./exceptions/ExceptionHandler.php";
+require_once "./exceptions/ConstructionException.php";
+require_once "./exceptions/ApplicationTypeException.php";
+require_once "./exceptions/UnexpectedUriTokenException.php"; 
+require_once "./exceptions/ManagerLoadedException.php"; 
+require_once "./exceptions/XEUriTokenError.php"; 
+require_once "./exceptions/XExceptionType.php"; 
+require_once "./ECApplicationType.php";

@@ -4,7 +4,6 @@ namespace Core\initial;
 
 use Core\initial\Classes\BaseLoader;
 use Core\initial\exceptions\ApplicationTypeException;
-use Core\initial\exceptions\ECApplicationType;
 use Core\initial\exceptions\ExceptionLevel;
 use Core\initial\exceptions\ManagerLoadedException;
 

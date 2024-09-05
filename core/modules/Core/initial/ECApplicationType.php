@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\initial\exceptions;
+namespace Core\initial;
 
 enum ECApplicationType: string
 {
@@ -9,5 +9,7 @@ enum ECApplicationType: string
     case CRON = 'AT_C';
     case AJAX = 'AT_A';
     case REST = 'AT_R';
+    case PUP_API = 'AT_PA';
+    case SEC_API = 'AT_SA';
     case CMD = 'CMD';
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Providers;
+namespace Core\initial\Providers;
 
 use Core\initial\Classes\Provider;
 

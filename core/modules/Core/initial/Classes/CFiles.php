@@ -11,7 +11,7 @@ class CFiles {
     const string LIBS = self::ABSPATH.'lib/';
 
     const string MEDIA_JS = self::ABSPATH.'media/js/';
-    const string MEDIA_CSS = self::ABSPATH.'media/css/';
+    const string MEDIA_CSS = self::ABSPATH.'media/sassConstruct/';
     const string MEDIA_IMG = self::ABSPATH.'media/img/';
 
     const string ELEMENTS = self::ABSPATH.'elements/';

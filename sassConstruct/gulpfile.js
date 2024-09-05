@@ -9,7 +9,7 @@ const sass = require('gulp-sass');
 gulp.task('styles', function () {
     gulp.src('./**/*.scss')
         .pipe(sass().on('error', sass.logError))
-        .pipe(gulp.dest('assets/css'))
+        .pipe(gulp.dest('assets/sassConstruct'))
 });
 
 // gulp.task('scripts', function () {

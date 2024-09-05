@@ -3,7 +3,7 @@ declare(strict_types=1);
 global $initType;
 
 use Core\initial\CAPP;
-use Core\initial\exceptions\ECApplicationType;
+use Core\initial\ECApplicationType;
 
 ob_start("ob_gzhandler");
 error_reporting(E_ALL);

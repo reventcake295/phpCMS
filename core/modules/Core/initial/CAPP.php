@@ -6,9 +6,8 @@ use Core\initial\Classes\CLANG;
 use Core\initial\Classes\CUSER;
 use Core\initial\Classes\Provider;
 use Core\initial\exceptions\ApplicationTypeException;
-use Core\initial\exceptions\ECApplicationType;
 use Core\initial\exceptions\ManagerLoadedException;
-use Core\Providers\js_Provider;
+use Core\initial\Providers\js_Provider;
 use JetBrains\PhpStorm\NoReturn;
 
 final class CAPP {

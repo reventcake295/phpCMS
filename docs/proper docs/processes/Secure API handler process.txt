@@ -1,0 +1,19 @@
+Handler: secureAPI
+This hadnler is for the hadnling of requests made to the secure api
+
+The process goes as follows:
+Check if the client has not exeeded the given limits
+	If exceeded give a too many request error to the web engine and then exit the handler
+	If not exceeded continue
+
+Determine if url request exits in the url match list for secure api requests
+	If match exits retrive the data and continue
+	If match does not exits retrun a 404 to the web engine and then exit the handler
+
+Determine if the client has access to the endpoint
+	If not retrun a 401 or 403 to the web engine and exi tthe handler
+	If it does continue
+
+Format the request in acordance with the format given by the match data
+	If format returns an error handle it according the format data and the give the sresult to the web engine and then exit the handler
+	If the format retruns correct then call the executor and process the request, send the resulting data to the web engine and exit the handler

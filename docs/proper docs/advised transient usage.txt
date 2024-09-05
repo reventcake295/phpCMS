@@ -1,0 +1,14 @@
+Transient data handling:
+$transientData = null;
+try {
+	$transientData = getTransient(string $key);
+} catch (TransientNotFound $e) {
+	$transientData = // generate the transient data
+	setTransient(string $key, $transientData, +int $expiryTime);
+}
+// continue working
+
+getTransient($key); requires a key in the form of a string to retrive the transient, may throw an exception if the transient does not exits or is expired in the form of the exception: TransientNotFound
+setTransient($key, $transientData, $maxExpiryTime); // requires a key, data to store and a max expiry time in seconds for how long the transient may be stored may be deleted before that too, leaving any empty or with any invalid values will throw an exception
+
+If you are trying to use transients for something and are not taking how transients work into account then you are not using the correct method, see the documentation about the possible internal functionality's for other options that can be used

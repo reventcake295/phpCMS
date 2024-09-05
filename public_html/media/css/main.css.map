@@ -1,0 +1,13 @@
+{
+    "version": 3,
+    "mappings": "AEAA,AAAA,IAAI,CAAC;EACD,KAAK,EAAE,IAAI;EACX,MAAM,EAAE,QAAQ;EAChB,MAAM,EAAE,IAAI;CAOf;;AAVD,AAII,IAJA,CAIA,EAAE,CAAA;EACE,KAAK,EAAE,KAAK;EACZ,MAAM,EAAE,IAAI;EACZ,KAAK,EAAE,IAAI;CAEd",
+    "sources": [
+        "main.scss",
+        "src/general/_reset.scss",
+        "src/general/_colours.scss",
+        "src/general/_html.scss",
+        "src/general/_input.scss"
+    ],
+    "names": [],
+    "file": "main.css"
+}

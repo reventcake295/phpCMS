@@ -1,0 +1,7 @@
+{
+  "head": "<form id='$form_id%' target='%form_url%' method='%form_method%' %form_attributes%>",
+  "footer": "</form>",
+  "inputs": {
+    "inputText": "<input id='input_id%' name='input_name%' type='text'>"
+  }
+}

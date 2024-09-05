@@ -1,0 +1,55 @@
+Client request process
+Web enige receives a client request
+Web engine follwos the following structure:
+if url starts with: /media/
+	if exists in &/web/media/ : give the file
+	if not exits in &/web/media/ : redirect to &/web/media/MediaRequest.php
+
+if url starts with: /api/
+	if url contains /api/*/public/ redirect to: &/web/api/public/APIRequest.php
+	if url contains /api/*/secure/ redirect t0: &/web/api/secure/APIRequest.php
+	else: redirect to /index.php
+
+if url starts with: /ajax/ redirect to &/web/ajax/AjaxRequest.php
+
+if url exists as file with '_page.html' appended in the folder &/web/: redirect to the file
+Otherwise redirect to: &/web/index.php
+The request is either finished as the recourse has been given. or the request is redirected into the system for handling
+
+------
+
+Note: depending on wich starting file recieves the request the processes differs, see the Handler processes for the specifics on how the diffrent types of request are handled, the only noted things here are what type of request it is in the system
+
+&/web/media/MediaRequest.php
+Type: media
+
+&/web/api/public/APIRequest.php
+Type: publicAPI
+
+&/web/api/secure/APIRequest.php
+Type: secureAPI
+
+&/web/ajax/AjaxRequest.php
+Type: ajax
+
+&/web/index.php
+Type: page
+
+The incoming file redirect only does a require() to one of a certain group of files in the folder &/requests/ the file requested is as follows: type_@type_request.php
+The file loaded via the require() does the actual configuration of the request type and loads in the initial module via direct require() of the load.php file of the initial module
+
+After the load of the initial module is completed the last action the the request file is to execute the CAPP:init(@type); function
+
+In the init function the required classes are initialized and the bare minimum of config settings is loaded
+The follwoing action is to get the correct handler in accordance to the @type and to hand over execution to the Handler
+The process of the Handlers is decribed separetly to keep the size of this document to a reasonable size
+
+After the handler has finished execution the init function calls the function CAPP::finalize() to finish up execution 
+In the finalize function the following happens:
+Activation of the Listeners that were triggerd with the notation of activate before transmission of data to the client
+Transmission of the data to the client
+The Cgi connection is closed; --------- Here the client reqeust is finished, after this the serverside handling of request tasks is to be done
+
+Activation of the Listeners that were triggerd with the notation of activate after closure of cgi connection
+Transmission of the triggerd Listeners with the notation of execution via CRON
+

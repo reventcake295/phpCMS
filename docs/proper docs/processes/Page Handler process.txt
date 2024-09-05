@@ -1,0 +1,23 @@
+Handler: Page
+The page handler is for the handling of the request for a page
+The process goes as follows:
+
+Determine if POST is present:
+	if POST is present, retrive POST variable executor and retrive fitting format for POST request
+	format the POST in accordance with the format retrived and then if everything is correct call the executor file and have it execute
+	when the executor is done receive the output in accordance with the format retrived and then make the output avaible for usage in this request, and then continue as normal
+	if not present, continue as normal
+
+lookup the url path in the Pages registry and see if any match
+	if match proceed after retrieving the given settings for the match
+	if none match default to the standard 404 page and then exit the Handler
+	
+Check if the client has permission to access the resource
+	if permitted: continue
+	if not permitted: retrun one of the given options for this match and then exit the handler
+
+If the url match says it is a static page or dynamicStatic: check secure cache
+	if file exits give the file to the Web engine and then exit the handler
+	if file does not exits generate the file in accordance to the given given information of the url match and then give the file to the web engine and then exit the Handler
+	
+If page is dynamic generate the page and give the data to the web engine and then exit the Handler

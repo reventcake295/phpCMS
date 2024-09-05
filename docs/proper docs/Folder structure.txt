@@ -1,0 +1,76 @@
+Folder structure:
+The struture of the site is simple and is referenced in the documentation avaible for the system a lot
+
+There are certain characters used in the documentation that have specific meaning in relation to the folder structure, these characters are called diffrently within the the implementation of the system see the Files class for the definitions used
+'~': means the root folder of the compleet fodler structure and nothing is allowed to oparate outside this folder no matter what, this is to be secured via directory restrictions placed on the process via the config
+'&': means the current active site, this means that if a request comes through site.ex the folder ~/sites/site.ex/ is referenced
+'#': means the modules base folder: ~/modules/
+'*': means that the text that is placed here is changeble due to certain factors, usaly what this affects is written besides is in () Do note that this ussaly means that it is reliant on user input and must therefor be properly checked if, 1) user input clears the requirements of the input, 2) The proposed file is inside the correct directory,  3) the file exits, 4) the user may access the file, notable is that incase of singular files and singular folders separete requirements sets are to be applied then when directory traversing is requried(In case of singular file or folder point 2 does not have to be checked)
+
+
+The structure:
+/
+	sites/
+		*/ (Wherein * means the name of the site as written in the url path e.g.: 'site.ex' of 'https://site.ex/home', if www. is used in it it is also placed here)
+		    requests/
+        		type_page_request.php
+        		type_media_request.php
+        		type_publicApi_request.php
+        		type_secureApi_request.php
+        		type_ajax_request.php
+			web/
+				ajax/
+					AJAXRequest.php
+				api/
+					*/ (Wherein * means the version of the API)
+						public/
+							APIRequest.php
+						secure/
+							APIRequest.php
+				media/
+					MediaRequest.php
+					* (Wherin * means that any media file can be placed here, may also be placed in subdirectory's)
+				index.php
+				*_page.html (Wherein * is the name of the reuqest type)
+
+	modules/
+		module_*_folder/ (Wherein * means the name of the module which is contained whitn the folder, is only a singular folder no subdirectory's)
+			init.php
+			load.php
+			delete.php
+			module.xml (File format subject to change depending on how this is going to be implemented)
+			providers/
+				provider_*_module.php (Wherein * means the name of the provider)
+			components/
+				*_component.php (Wherein * means the name of the component, may be placed in subdirectory's)
+			executors/
+				post/
+					*_executor.php (Wherein * means the name of the executor, may de placed in subdirectory's)
+				api/
+					public/
+						*_executor.php (Wherein * means the name of the executor, may de placed in subdirectory's)
+					secure/
+						*_executor.php (Wherein * means the name of the executor, may de placed in subdirectory's)
+				ajax/
+					*_executor.php (Wherein * means the name of the executor, may de placed in subdirectory's)
+			dataFormats/
+				*_format.php (Wherein * means the name of the format, may be placed in subdirectory's)
+			* (Wherin * means any file needed for the module to function, may be placed in subdirectory's, these files are never called directly and are thus not beholden to specifc naming conventions other than the standard php naming conventions)
+	upload/ (php execution is disabled within this folder)
+		* (Wherin * means any file that has been uploaded, may be palce in subdirectory's and the retrival method is allowed to use the full filename for retrival)
+	components_cache/
+		cache_*_component.php (Wherein * means the name of the component that is cached)
+	page_cache/
+		*_page.php (wherein * means the name of the page that is cached, may be palced in subdirectory's depending on the calling url)
+	logs/ (php is disabled witnin this folder)
+		*/ (Wherein * means the date of the logs)
+			error_*_log.log (Wherein * means the date of the log)
+			debug_*_log.log (Wherein * means the date of the log), may not exits depending on the debug settings if they were enabled
+			event_*_log.log (Wherein * means the date of the log)
+		error_log.log # the log of the current day
+		debug_log.log # the log of the current day, may not exits depending on the debug settings
+		event_log.log # the log of the current day
+	customComponents/
+		*_component.php (Wherein the * means the name of the component, may be placed in subdirectory's)
+	pages/
+		*_page.php (Wherein the * means the name of the page, may be placed in subdirectory's)

@@ -1,0 +1,29 @@
+Handler: media
+The media handler is for the handling of reqeusts for media files including uploads
+The process goes as follwos:
+
+Determine if url request exits in the url match list for media requests
+	If match exits retrive match data and continue
+	If no match exits return a 404 and exit the handler
+
+One of the following cases happens depending on what the match data says
+If match data says stored in secure media cahce, check access permission
+	If permission granted, give the file to the web engine and exit the handler, if file does not exits see if it is contructible and then give the file to the web engine other wise retrun a 404, raise a error to the administrators and exit the handler
+	If permission not granted return a 401 or 403 depending on the reason of no permission and then exit the handler
+
+If the match data says it is an uplaoded file:
+	check if file exits	
+		if yes:
+			check access permission
+				If permisison granted: give the file to the web engine and exit the handler
+				If permission denied: return a 401 or 403 depending on the the reason of permission denied and then exit the handler
+		If no: return a 404 and then exit the handler
+
+If match data says it is a custom built file:
+	check access permisison
+		If no: return a 401 or 403 depending on the the reason of permission denied and then exit the handler
+		If yes:
+			format the request data in accordance with the format stated in the match data
+				If the format returns an incorrect, handle it as stated in the format, give the data as given by the error handling of the format to the web engine and then exit the handler
+				If the format returns an correct with the data, call the executor referenced and then generate the file, follwoing that send the file to the web engine and then exit the handler
+

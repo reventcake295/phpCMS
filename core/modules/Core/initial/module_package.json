@@ -1,0 +1,9 @@
+{
+  "name": "Core/initial",
+  "loader": "include.php",
+  "version": "0.1",
+  "date": "13-11-2022",
+  "description": "The core/initial module, required for running the website",
+
+  "dependencies": {}
+}

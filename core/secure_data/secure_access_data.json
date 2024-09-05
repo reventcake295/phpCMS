@@ -1,0 +1,37 @@
+{
+  "open": true,
+  "header": "",
+  "footer": "",
+  "subGroups": {
+    "admin": {
+      "open": false,
+      "userRequired": false,
+      "userDefault": false,
+      "redirect": "user/accessDenied?reason=admin",
+      "header": "",
+      "footer": "",
+      "allowed": [],
+      "subGroups": {}
+    },
+    "err": {
+      "open": true,
+      "header": "",
+      "footer": "",
+      "subGroups": {}
+    },
+    "user": {
+      "open": false,
+      "userRequired": true,
+      "userDefault": true,
+      "redirect": "user/accessDenied?reason=user",
+      "header": "",
+      "footer": "",
+      "allowed": [
+        "login",
+        "register",
+        "accessDenied"
+      ],
+      "subGroups": {}
+    }
+  }
+}

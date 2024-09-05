@@ -1,0 +1,228 @@
+Format file format:
+The Format files contain a description of the format that a executor uses this is formatted according the following format:
+
+{
+	method: {
+		call: !'methodCall'
+		type: !GET|POST|PUT|DELETE
+		rate: !rate
+		dataFormat: !JSON|XML|form-encoded|...
+		requiredHeaders: {} (Dont know how this is going to be done, depends on how it is implemented)
+	}
+	input: {
+		$name: @variableType
+		...
+	}
+	output: {
+		$name: @variableType
+		...
+	}
+	error: {
+		'wrong http method': {
+			header: '405 Method Not Allowed'
+			response: !'use $method:type'
+		}
+		'access denied': {
+			header: '403 Forbidden'
+			response: !'You are not allowed to access this method'
+		}
+		'Unauthorized': {
+			header: '401 Unauthorized'
+			response: !'You are not loggedin'
+		}
+		'too many request': {
+			header: '429 Too Many Requests'
+			response: !'limit passed'
+		}
+		'Server error': {
+			header: '500 Internal Server Error'
+			response: !'Something went wrong'
+		}
+		'invalid format': {
+			header: '415 Unsupported Media Type'
+			response: !'The data must be send in: @method:dataFormat'
+		}
+		'conflict': {
+			header: '409 Conflict'
+			response: !'This call is causing a conflict'
+		}
+		'bad data': {
+			header: '400 Bad Request'
+			response: {
+				"error": {
+					"code": 400,
+					"message": !"Invalid request parameters",
+					"details": [
+						{
+						  "field": !$name,
+						  "message": !$name:AbsentErrorMessage
+						}
+					]
+				}
+			}
+		}
+		'Invalid data': {
+			header: '422 Unprocessable Entity'
+			response: {
+				"error": {
+					"code": 400,
+					"message": !"Invalid request parameters",
+					"details": [
+						{
+						  "field": !"email",
+						  "message": !"Email is required and must be a valid email address."
+						}
+					]
+				}
+			}
+		}
+		
+		'': {
+			header: '410 Gone'
+			response: !'This version of the api has a newer version in use, use that: $api:version'
+		}
+		'conflict': {
+			header: '413 Payload Too Large'
+			response: !'The request is too large, please downsize it.' (Depending on how it is implemented this may never be properly used)
+		}
+		'conflict': {
+			header: '428 Precondition Required'
+			response: !'There are headers missing, these are $method:requiredHeaders'
+		}
+		
+	}
+}
+
+The @variableType is a selection of varaible types that may be used in the format and each has its own set of required fields and options that are possilbe:
+The standard format that is to be used:
+*: { (Wherein the * is the name of the variable)
+	type: Enum_formatVariableType
+	description: String
+	required: boolean
+	errors: {InvalidValues, ValueNotPresent, 404 Not Found} (List of cases with messages for when the value goes outside the given boundries to display to the client)
+}
+executor path: {
+	type: executorPath
+	description: 'The path to the executor for the processing of this request'
+	required: true
+	errors: {404 Not Found}
+}
+strictArray: {
+	type: strictArray
+	description: 'A Array with a pre determined set of values contained within, al values have their own @varaibleType'
+	subValues: {
+		$name: @varaibleType
+	}
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent}
+}
+variableArray: {
+	type: variableArray
+	description: 'a Array that contains an possibly undetermined amount of values that have no assigned name to them of the same @varaibleType'
+	subValueType: @varaibleType
+	~maxCount: Interger
+	~minCount: Interger
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent, ~ItemCountOutOfRange|[ItemCountUnderRange, ItemCountAboveRange]}
+}
+
+tel: {
+	type: tel
+	description: 'A phone number in a given format'
+	format: international|national|...
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent}
+}
+
+email: {
+	type: email
+	description: 'A emailaddress'
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent}
+}
+
+interger: {
+	type: interger
+	description: 'A interger that may be restricted to a certain range'
+	~minNumber: Interger
+	~maxNumber: Interger
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent, ~NumberOutOfRange|[NumberUnderRange, NumberAboveRange]}
+}
+float{
+	type: float
+	description: 'A float that may be restricted to a certain range, and has a number precision after the dot noted'
+	decimalPrecision: Interger
+	~minNumber: float
+	~maxNumber: float
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent, ~NumberOutOfRange|[NumberUnderRange, NumberAboveRange]}
+}
+money: {
+	type: money
+	description: 'A interger that represent a value in money in cents, may be restricted to a certain range, and the valuta accepted is noted'
+	valuta: valutaName
+	~minNumber: Interger
+	~maxNumber: Interger
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent, ~NumberOutOfRange|[NumberUnderRange, NumberAboveRange]}
+}
+date: {
+	type: date
+	description: 'A date that may contain a timestamp, and is formatted according to the given format'
+	format: dateTimeFormat
+	~startRange: {string representation of day}|{dateTime formatted in the given format}
+	~endRange: {string representation of day}|{dateTime formatted in the given format}
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent, ~DateOutOfRange|[DateBeforeRange, DateAfterRange]}
+}
+boolean: {
+	type: boolean
+	description: 'A boolean may either be true or false'
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent}
+}
+text: {
+	type: string
+	description: 'A string, html processing must be done on the string depending on what is given'
+	htmlProcess: strip|convert_all|convert_double
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent}
+}
+html text: {
+	type: string
+	description: 'A string, html processing must be done on the string depending on what is given, if certain_keep is given the tag tags is to be used to determien what stays'
+	htmlProcess: strip|convert_all|convert_double|keep|certain_keep
+	~tags: ![''] (List of html tags that is kept when the marking certain_keep is given)
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent}
+}
+file: {
+	type: file
+	description: 'A file, is processed in arccordence to the given settings set here'
+	extensions: ~[''] (List of extensions that is allowed for the file)
+	maxFileSize: Interger (The max filesize in bytes)
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent, fileTypeIncorrect, FileSizeTooLarge}
+}
+file variable: {
+	type: fileVariable
+	description: 'A varaible that is used for when the client has direct control over wich file is to be used for something'
+	PermissionTree: PermissionNotation|PermissionNotation<>
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent, 404 Not Found, AccessDenied}
+}
+folder&file variable: {
+	type: folderFileVariable
+	description: 'A varaible that is used for when the client has direct control over wich fodler and file is to be used for something'
+	PermissionTree: PermissionNotation|PermissionNotation<>
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent, 404 Not Found, AccessDenied}
+}
+folder variable: {
+	type: folderVariable
+	description: 'A varaible that is used for when the client has direct control over wich folder is to be used for something'
+	PermissionTree: PermissionNotation|PermissionNotation<>
+	required: boolean
+	errors: {InvalidValue, ValueNotPresent, 404 Not Found, AccessDenied}
+}

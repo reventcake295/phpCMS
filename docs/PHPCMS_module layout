@@ -1,0 +1,315 @@
+Website CMS system developed in PHP:
+Disclaimer:
+The words used in this document are not meant discremently and everything in this document is only related to the description a a website CMS system and nothing else
+
+The naming conventions used in the system depending on where it is used but it is generely the same everywhere:
+File names:
+The names of files are standarzized in accordence with the content and should be written in Pascal Case, the only exception to this is when the name of a file has a part of it as a varaible then the variable should be written as one of the follwoing dependign on the case:
+Singular file: 'Example_' + {FileVariable} + '_File.extension'
+Folder structure + file: $folderBase/ + {Folder&FileVaraible} + '_example.extension'
+Fodler structure: $folderBase/ + {FolderVariable} + '/ExampleFile.extension'
+Note: the extensions are hard coded when a file is accessed and cannot be changed by user or administrator outside specific settings when required otherwise not
+Do note that varaibles used in this manner are not allowed to use a certain range of characters, these are: '_', '.', '-', '~' And for file variables: '/'
+This is tested for before usage for the variable and when detected WILL throw a user exception and is immedtly logged and causes a message to be sent to the administrators in regards to this, there is also a permisison check if the current user is allowed to access the file, if not it will be handled as specified in the permission notation for the file.
+Furthermore the folder variable portion has some checks performed on it too, these are:
+The variable may not begin with a '/'
+The variable may not end with a '/' in case of only folder variable
+The varaible may not contain a '/' when it is only one directory and no subdirectory's
+These tcases are tested for unilitrly and cannot be deativated no matter what, the methods that do this are accesible by other modules and must be used when procesisng user input, this is handled by the request formatter using the supplied format that contains markings in regards to this.
+If the file does not exist inside the permisison system one of the follwoing cases is followed:
+Page or file request of the user: return 404, add notice in log about accesing of 404 page and current url alongside user info, log 404 in user path for the protection system to determine problom users
+File exists in file system but not permisison tree: user accessed a system file and is thus generly assumed to be trying to hack the system, causes the protection system to immedtly block the user from accessing the site
+File does not exits in either file structure or permission tree: user is posibly a normal user but made a mistake returns a 404 if needed and sends a notice to the administrators that a file was not found in the system alongside the infromation required about the attempted accessing of a non-existant file, also lets the code that attempted to retrive the file handle the error that is generated about finding a non-existant file
+File does not exits in file structure but does exits in permission tree: determines the nature of the file and creates the file if possible and just goes along as normal, otherwise returns a 500 error to the user and sends a warning to the administrators the a file in the permission tree was not found and incldues the info about the what and where
+
+The system can be deployed in two ways:
+Singular server:
+Everything is done on the single server
+
+Master server + Slave(s) server(s):
+Multiple servers with one server in the lead and possible multiple servers that handle the requests of the clients and let the master server handle the background tasks like the cahce; 
+
+The calls the site has to handle for the full functionallity of the site.
+All calls are handled in https if calls are send along another method it will either be redirect to https or outright denied either way the attempt will be logged.
+The calls can have multiple versions and data formats present, these are:
+- Page call
+Methods:
+	The standard page call and has certain standard GET variables 
+		url='' // The page url not standard displayed in teh browser is formed by apache fro handeling internally
+		noscript=true|false // Wheter the client wants a noscript page, can disable certain fucntions on the page or disable the complete page, depending on what the page functions are
+	 	lang='' // modify the response languege tvia the GET can also be modified with AJAX or the lang header
+	 - GET
+	 	Along with the above mentioned variables there are additonal variables possible depending on the page requested, note: only publicly avaible fucntionallity is handled via this method
+	 - POST
+	 	Informational handling for the user, only methods the user has access to are handled here otherwise it will either silently fail or a error message is dispalyed
+	 - SESSION
+	 	The variables for the user in the current session, also stores the user authorization keys for the access controls
+	 - COOKIES
+	 	The variables that store information on the system of the user for later usage, user has control of what is stored on the system and only low level information is stored on the sytem the rest of the information is stored server side behind a multi combinational access check includes a key stored in the cookies, ip and hardware information visable to the server
+Description:
+The call used for retrival of the page itself, can include a POST body that is handled by the excecutor specified allowing for two separete things to happen, a informational handling and a page display that can be unrelated to each other
+- AJAX call
+Methods:
+	- GET
+		Standard information retrival for dynamic_static pages, only publicly avaible information is send along these calls
+	- POST
+		Informational handling for the user, only data that the user has access to are sent along these calls
+	 - SESSION
+	 	The variables for the user in the current session, also stores the user authorization keys for the access controls
+	 - COOKIES
+	 	The variables that store information on the system of the user for later usage, user has control of what is stored on the system and only low level information is stored on the sytem the rest of the information is stored server side behind a multi combinational access check includes a key stored in the cookies, ip and hardware information visable to the server
+Description:
+For the retrival of setting of pure data without any extra's as would be done via a page call, this call can only be used with pages retrived via the Page call, and only alows the usage of methods made avaible via the standard methods for usage, if a module has not made an AJAX method avaible and enabled via the standard methods for such it does not exits and will be handled as such depending of wehter it is avaible and disabled or not made avaible
+- API call
+Methods:
+	- public GET
+		Standad publicly avaible information retrival, has certain rate limits to prevent overloads, no api key required,
+		these methods are avaible via the public endpoint: /api/v1/public/ , These requests get internally processed as callVer='v1',callType='public',call='' in the GET
+	- restricted GET / POST
+		Informational handling among systems, requires authorized access keys for the functions in the call, otherwise the request will be denied with a unathorized access response
+		Tehse call go through the restricted endpoint: /api/v1/private/ , these requests get internally proceseed as callVer='v1',callType='private',call='' in the GET
+Description:
+Allows for the handling of information between machines, type of call follwos the OpenAPI standard and includes standard documentaiton avaible to the user via a swagger UI per module that has API methods made avaible for usage, if a module has not made an API method avaible and enabled via the standard methods for such it does not exist and will be handeld as such depending of wehter it is avaible and disabled or not made avaible
+- media call
+Methods:
+	- GET
+		Standard media file retrival, performs a check if the user has access to the requested media file, 
+		This call would not be processed if the media file was publicly avaible, apache would just hand it over.
+	- POST
+		For special media file request that must be custom formatted for the reuqest, performs a check if the user has access to the requested file
+	 - SESSION
+	 	The variables for the user in the current session, also stores the user authorization keys for the access controls
+	 - COOKIES
+	 	The variables that store information on the system of the user for later usage, user has control of what is stored on the system and only low level information is stored on the sytem the rest of the information is stored server side behind a multi combinational access check includes a key stored in the cookies, ip and hardware information visable to the server
+Description:
+Provides the requested media files provided the user has access to the media file, can also compile the media file if needed but will compile the file and store it in the cache if possible, however the CRON should not allow such to happen and pre-compile the files and put in into the cache, or when the files are edited they will be recompiled and stored in the cache
+
+Internal systems these are system components that handle internal functionalities that the user should not have to deal with in any way, these are:
+- Cli
+The system that allows direct administration of the compleet system, and is thus also only accesible from the console on the server itself, do note that if the server is deployed with master / slave servers it is only accesible on the master server, requires login information the be supplied directly form the command line and not from a referenced file, this is checked for during load of the CLi handler
+- Cron
+The system that handles the automatic tasks or background tasks that were added into the queue, note this runs on both the master and slave installations, and depending on wheter it is the master or slave a difrent set of tasks will be dealt with; These tasks include:
+Master:
+File integrety check
+Cahche updating
+
+Slave:
+File integrety check
+Chache refresh (download from master server via private API call via the Slave account on the master server)
+- Page builder
+
+Request format:
+The request is autoamticly formatted by the system to allow for proper handling of errors, these are automaticly supplied by the modules on init along side the excecutors and error handlers for them.
+The format that must be supplied depends on what the format is supplied for but can generly be assumed to be the same everywhere, usage of the proper data type is encuraged for the correct handling of the data, The follwoing data types are to be accepted:
+- executor path
+  - a type of folder&file variable specificly meant for the processing of the POST
+- tel
+- email
+- interger
+- float
+- money
+  - must contain notation about the valuta accepted
+- date
+  - must contain notation about the given timestamp format and timezone
+- boolean
+- array
+  - must contain a list of the given sub variables for validation, all data types are to be supported for usage within another array up to the practical limits given by the system
+- text
+  - must contain a notation about the processing of html tags; one of the following must be supplied: strip, convert_all, convert_double
+- html text
+  - must contain a notation about the processing of html tags; one of the following must be supplied: strip, keep, convert_all, convert_double
+- file
+  - Must contain markings about the file type and such for proper proccesing
+- file variable
+  - must contain a permission tree item (range) name that specifies the permission rights for this variable
+- folder&file variable
+  - must contain a permission tree item (range) name that specifies the permission rights for this variable
+- folder variable
+  - must contain a permission tree item (range) name that specifies the permission rights for this variable
+
+Futhermore the usage of request methods is not allowed due to injection possiblities and it will be tested for as needed, and the deletion of Non-characters will be tried to ensure that it will not cause a security breach when the mainstream process does it. Will also test first and then translate the input if possible and then try again to ensure that it will also not cause a security breach
+
+The process of a calls goes as follows:
+load and Init of initalCore
+Load of Handler and start of handler proccess; see the handler proccess for futher detail
+Handling event listerners triggerd and marked before_ReqeustClosure
+Final compiling of data and send to the client
+client Connection closed [fastcgi_finish_request();]
+Handling events listeners triggerd and marked after_RequestClosure; this includes things like request logging
+Messaging sysMessageStream_CRON with the triggerd lsiteners and marked CRON_message
+
+Providers are small classes of modules, not all modules have a provider however, depends on if the providing features of the module can be renderd down to a single / few classes depending on the features group
+However if multiple feature groups can be made from one module it can be better made as separete modules to prevent bloat, feature creep and load time of the system
+
+Handlers are classes designed to handle the difrent types of request that come in these include:
+- Page: Gives the location of the page if the page is compeltly build or builds the page out of the final components if it is not
+- POST: handles post requests and passes it on afterwards to the Page handler, provides a result to the page handler based on what the post request is
+- Media: gives the location of the media file if it is not in the public folder of the site
+- AJAX: handles the AJAX call that browser clients can make
+- API: Handles API calls that can be made by external machines
+- Cli: Loads the command line core compnents in for managment from the command line, also does a file integrety check and if failed exits the the system saying such
+- CRON: handles the automatic tasks that are scheduled
+- Page builder: works in combination with the page builder to render the pages as compleet as possible for the Page Handler
+See the method calls listing for the information about the handlers that deal with request form the user, see internal systems for the rest of the handler descriptions
+
+A module has serveral standard functions that must be callable by the core, this incldues the modules of the core
+These are:
+- module info
+- initialize, must give all the separate parts that are calleble to the required core modules
+- disable, must notify all core modules that is is bieng disabled so they can mark this in their process, note core modules are not allowed to have this function
+- remove, must notify all core modules that the module is being deleted so they can remove the data of the module, note core modules are not allowed to have this function
+- permission tree
+- executors
+- components
+- language markers
+- event listeners
+- event triggers
+- Internal API methods
+- External API methods
+- AJAX methods
+
+PHPCMS core module definitions
+- initial:
+Always loads and is the way for loading the required parts for the request
+Provides the following: It incldues a test case of the required part is present in the system, the load command and if the required part is loaded or not
+Providers
+- providerExists(string $providerId): bool
+- loadProvider(string $providerId): bool
+- isProviderLoaded(string $providerId): bool
+- loadedProviders(): Array<string>
+- getAllProviders(): Array<string>
+
+Modules
+- moduleExists(string $providerName): bool
+- loadModule(string $providerName): bool
+- isModuleLoaded(string $providerName): bool
+- loadedModules(): Array<string>
+- getAllModules(): Array<string>
+- getModuleInformation(string $moduleId): ModuleInfo
+
+Handlers
+- handlerExists(enum_Handlers $handler): bool
+- loadPHandler(enum_Handlers $handler): bool
+- isHandlerLoaded(enum_Handlers $handler): bool
+- loadedHandler(): enum_Handlers
+- getAllHandlers(): Array<enum_Handlers>
+
+- Media
+Handles everything surrounding the managment of all media that is present in the site, this includes:
+- image compresison into webP and other simalar methods
+- js and css file minifier
+Functions:
+MinifyCSS(string $fileLocation, string $destination, array<?> $options);
+$options // The options in regards of how to process the CSS file, may also expand it for the processing of SCSS files instead of CSS files
+MinifyJS(string $fileLocation, string $destination, array<?> $options);
+$options // The options in regards f how to process the JS file
+ProcessImage(File $imageFile, array<?> $settings);
+Prcess a image for usage on the website, depending on how $settings is set and other global settings that are retrived during function
+
+Includes a provider that provides the pieces of code that are placed on the page, and also a libary dependency managing so there are no duplicate libary's added into the site
+Provider functions:
+RegisterScript(string $name, string $version, string $fileLocation, array<?> $options = []);
+$options = [
+	'dependencies' => ['name' => 'core', 'minVer' => '1.0'],
+	'async' => 'true|false,
+	'location' => 'head|footer'
+]
+RegisterCSS(string $name, string $fileLocation);
+PlaceImage(string $fileLocation, array<?> $settings = []);
+$fileLocation // NOTE: This is subject to change depending on how the image handling is goign to be constructed, may use instead of a file location a id from the database and from there all the data abotu the image is pulled and worked with along side the $settings
+$settings = [
+	'alt' => '',
+	... All the settings required for a image
+]
+ServeMediaFile(string $filename, array<?> $settings);
+The bog standard servering of a media file, how it is served depends on $settings
+
+- Page builder
+Builds the components of a page and if possible also the page it self depending on the type of dynamic content on the page and then sotores it in either the public portion of the site or the private portion depending on wheter the page is access locked or not, also minifies the page code for more compact transmission of data
+
+- Lang
+Handles everything in regards to language translations, also ensures that when a language change is made it will presist for the following page requests, also provides a javascript translation function to allow for switching of language without page reload, also includes a variable with messages that may be displayed to the user based on the reuslts of actiosn and AJAX requests
+Includes a provider that provides the text when requested embedded in a specific html element: <span lang="en" class="lang" id="lang_example">Im am in english!</span> for easy shifting between languages without page reload
+
+- settings manager
+A libary type of module for now that has all manor of settings update methods/classes for the centralized handling of such things
+Inlcudes a provider for the simplicity of loading all setting files where ever they may be stored, settings can also be stored in the database.
+It is advised to have the absolute en almost unchanging settings stored in file format and the more changeble ones in the database
+
+- data manager
+Manages the request data that has come in and was formatted
+Handles the consent of the user and the related data storage, includes a marking when stores that notes if the user consented to data selling to 3rd party's
+Cookie storage is handled via this module and the usage of 3rd party tracking systems is also managed thorugh this
+Incldues a provider that allows the storage of cookies via multiple methods that mark the type of cookie it is and checks if the users allows the type
+Also deals with the input of the Sesison data
+The current list of options is:
+- required (always enabled)
+- functional
+- tracking
+- advert
+- 3rd party
+
+- request formatter
+Formats the request into specific formats depending on the data type it is and validates it in accordens with the preset formats , refer to the call types above to see which are present when
+- GET
+- POST
+- SESSION
+- COOKIE
+
+- Database controller
+Controls access to the database and provides the formatted data classes when requested
+This moodule abstract the type of database used allowing for greater interchangebility when needed, includign possible chache methods when they get implemented
+
+- instalaltion data verifier
+A moduel that can verifier de complete system on wheter the files are edited or not
+Thsi has multiple parts, these are:
+- Installation
+ - Access check
+ - integrety check (check keys are retrieved from upstream maintaining server for the current isntalled modules and the specific version of it)
+- Site files
+ - Access check
+ - integrety check(dependend on site administrator to supply check key)
+- Orphan files
+ - Tries to find files that should not be where they are and brings them to your attenion, depending on location of found file the severity of the issue can change
+
+- Notification manager
+Manages notifications for the system and makes sure they end up by the required party's, e.g. during the processing of a user request something happens that another user has to be notified of, this is true for any type of user including the user that the request is bieng processed fo
+Includes a provider that handles the adding of another notice to the list on all types
+
+- Log manager
+Manages the logging of the system and handles the calls as needed and allows for the debugging incase it is turned on
+Incldues a provider that recieves the log calls and puts them away in storage for viewing
+
+- Permissions manager
+Deals with the permissions for all parts of the system and allows for expansion of the permission tree by other modules
+Incldues a provider that allows for the checking if a user has access to something
+
+- Event manager
+Stores the events a module can trigger and registers the events a module lsitens for, allows for cross module interactions without requiring both developers to take the other module into account, this includes the module groups of the same developer, e.g. the core modules use this sytem too, can also store events listeners for actions that do not exist for posislby non existent module at the current moment, becoems automaticly linked to the action when the action is registerd.
+The standard calls that are to be made are:
+addListeners(string $module, array<array<string>> $listeners): bool
+Adds the listeners of the module as stated in the call, the lsiteners themselfs have the following format:
+[
+	'event' => 'eventName',
+	'callback' => array('classname', 'publicFunction'),
+	'description' 'The description of what the listener is for'
+	'callTime' => enum_callBackTime[
+		immideatly, // used when a the listener has to return data for the display of data
+		Before_RequestClosure, // used when the listener has to send data to the client but is not reqiured for teh handling of the event directly
+		after_RequestClosure, // used when the listener has to use the request but it cannot wait for when the CRON gets to it
+		CRON_message // used when the event has to be handled but not immedetly
+	]
+]
+addEvents(string $module, string $eventName, string $description): bool
+
+PRovides a manger posibly, depends on the size of the module in regards to the functions required
+
+Sys Messaging module
+Handles the communication between the types of proccesses, this allows for the proccesisng of actions in a background thread created via CRON to allow for faster response times of php-fpm to cleint requests
+
+API handling module
+The module that deals with everything surrounding the API's of modules both internal, external and AJAX mehtods, this also incldues the documentation required for such and is compiled into one system for easy persuing of the information, note: this tries to follow the standard documentation methods for such, this currently is:
+External API: OpenAPI swagger
+Internal API: PHP-doc
+AJAX: OpenAPI swagger
+Includes standard doumentation with information about the usage of the methods that has to be followed to be able to allow for proper usage, note this is inatly only proved for viewing in the backend to prevent external actors from figuring out what modules are installed and active and their versions, do note that only the External API documentation can be allowed public access to due to security concerns

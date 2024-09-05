@@ -1,0 +1,60 @@
+Requirements of a module:
+THe module must comply with the standard file format for specific types of files, these are:
+Specific files that are standard:
+init.php
+load.php
+delete.php
+disable.php
+module.xml
+
+And the file groups that are standard:
+Providers
+executors
+Formats
+Components
+
+The specific files serve certain purposes these are:
+init.php:
+The initial registry of the module and must automaticly provide the following to the specified methods within the core modules:
+Triggers -> module:event manager::registerTriggers(Array<Array<String $name, String $module, Enum_triggerType $type>);
+Listeners -> module:event manager::registerListeners(Array<Array<String $name, String $module, Array<String $class, String $method>|String $method, Enum_activateTime $activationTime, Interger $params>);
+API
+	public -> module:api manager::registerPublicMethods(Array<Array<String $methodCall, String $formatLocation, String<folderFilePath> $executorPath);
+	secure -> module:api manager::registerSecureMethods(Array<Array<String $methodCall, String $formatLocation, String<folderFilePath> $executorPath);
+AJAX -> module:api manager::registerAjaxMethods(Array<Array<String $methodCall, String $formatLocation, String<folderFilePath> $executorPath);
+POST -> module:api manager::registerPostMethods(Array<Array<String $methodCall, String $formatLocation, String<folderFilePath> $executorPath);
+GET -> module:page builder::registerDynamicPages(String<Regex> $urlRegex, String $formatLocation, String<folderFilePath> $executorPath);
+Provider -> module:api manager::registerProviders(String<module> $module, String $providerName);
+Dependencies -> module:api manager::registerModuleDependency(String<module> $module, Array<String $moduleDependency>);
+Permission Tree -> module:permission manager::registerPermissionTree(String<module> $module, PermissionTree $permissionTree);
+Language translations -> module:language manager::registerLanguageTranslations(String<module> $module, Array<String<textMarker>:Array<String<lang>:String<text>>> $languageTranslations);
+Components -> module:Page builder::registerComponents(String<module> $module, Array<String<componentName>:String<filePath>, Array<String<SettingName>:String<SettingValue> $settings);
+load.php:
+The load file must load the module so it can function in it entirerty without problems due to not loaded files, note the dependencies must also be loaded in this file. This file does not have to check if the module is disabled that is already done before hand by the calling method
+
+delete.php:
+This file must delete all data in relation to this module and must notify the requried methods that it is being deleted
+
+disable.php:
+This file must disable all actions in relation to this module and must notify the required methods that it is bieng disabled
+
+module.xml
+Note: thsi format is subject to change depending on hwo this si implemented
+This file contains the necessary data about the module, to allow the system to properly work with the module and allow for the compleet file integrety check to execute without problems once the integrety of this file has bene verified by the system via the retrival of the code from the maintaining server, thsi server is assumed to be the central server that also hosts the core modules for downlaod and update, the current version of the module is noted in this file and is used to retrive the correct code
+
+The standard file groups must have the following:
+Each file group has a certain naming convention that must be followed if it is not followed the system will not use it due to the file not existing, this is caught during the init phase of the module when it tries to register the file for its purpase
+
+Providers:
+These files contain certain retrival methods that have relation to the module and are most often used even when the rest of the module is not required for the page, do note that these classes must function standalone and may be laoded alongside the module itself when it is requried for something else on the page.
+These classes always extend the same abstract class called BaseProvider and must implement its functions.
+
+executors:
+These files are used when a POST, Ajax or API call is made to the system and has a executor registerd in this module
+
+Format:
+THese files contain the formats used for the exectors to validate the data that is put in by the client and ensures that the data is properly processed by the system, also has formats for the output of data to ensure that the data is properly dispalyed
+These formats are also used for the generation of documentation of the system
+
+Components:
+These files are prebuild files that are supplied by the module for the development of the website for the usage of their module, do note that their may be functions included in the file that make use of the methods constructed by the module or its dependency's and no other modules are allwoed to be used, this is so its clear in the documentation what is used in the construction of the component

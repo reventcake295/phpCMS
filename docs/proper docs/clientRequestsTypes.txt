@@ -1,0 +1,40 @@
+Incoming request via: https://site.ex/api/*/public/... (Wherein * is the version of the api)
+Request type: Public API
+Can handle methods: GET
+Requires: N/A
+Response: JSON, http headers
+Handled: Auto redirect to ~/sites/site.ex/web/api/*/public/APIRequest.php
+
+Incoming request via: https://site.ex/api/*/secure/... (Wherein * is the version of the api)
+Request type: Secure API
+Can handle methods: GET, POST
+Requires: API Authencation method
+Response: JSON, http headers
+Handled: Auto redirect to ~/sites/site.ex/web/api/*/secure/APIRequest.php
+
+Incoming request via: https://site.ex/ajax/...
+Request type: AJAX Call
+Can handle methods: GET, POST
+Requires: Session registred
+Response: JSON, http headers
+Handled: Auto redirect to ~/sites/site.ex/web/ajax/AJAXRequest.php
+
+Incoming request via: https://site.ex/media/...
+Request type: Media
+Can handle methods: GET
+Requires: N/A
+Possible requirements: Session registred, Logedin authencation
+Response: File format of media file, http headers
+Handled: if file exists send file, otherwise redirect to: ~/sites/site.ex/web/media/MediaRequest.php
+
+Incoming request via: https://site.ex/... (Any path except one of the above)
+Request type: Page
+Can handle methods: GET, POST
+Requires: N/A
+Possible requirements: Session registred, Logedin authencation
+Response: html, http headers
+Handled: if file exists as a *_page.html send file, otherwise redirect to: ~/sites/site.ex/web/index.php (Wherein * means the url of the request after the name of the domain)
+
+All the named files above are all the files visible within the site root not for direct use by the client and only contain a singular action: require file: ~/sites/site.ex/requests/type_*_request.php (Wherein * is the name of the reuqest type)
+
+

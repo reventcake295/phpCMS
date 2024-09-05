@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="5f533ad3-4006-47e2-be39-3a80a6d30c26" name="phpCMS" url="http://phpcms.dev/">
+        <fileTransfer mountedRoot="$PROJECT_DIR$/public_html" accessType="MOUNT" port="0" />
+      </webServer>
+    </option>
+  </component>
+</project>
